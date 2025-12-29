@@ -19,7 +19,7 @@ logs/
 
 # --- Database / Data ---
 # Since you have a /data folder with JSON files:
-src/data/*.json
+data/*.json
 # (Note: Remove the line above if you WANT to track your JSON data files)
 
 # --- OS / IDE Metadata ---
