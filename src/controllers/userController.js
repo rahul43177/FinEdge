@@ -27,8 +27,24 @@ async function login(req,res,next) {
     }
 }
 
+async function userProfile(req,res,next) {
+    try{
+        const userId = req.userData.userId; 
+        console.log("user entire data through token:" , req.userData); 
+        const profile = await userService.getUserById(userId);
+        
+        res.status(200).json({
+            status : true , 
+            data : profile 
+        })
+    } catch(error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createUser , 
-    login
+    login, 
+    userProfile
 }
 
