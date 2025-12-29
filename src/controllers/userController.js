@@ -42,9 +42,27 @@ async function userProfile(req,res,next) {
     }
 }
 
+
+const updateBudget = async (req,res,next) => {
+    try {
+        const userId = req.userData.userId; 
+        const {monthlyBudget, savingTarget} = req.body; 
+
+        const updatedBudget = await userService.updateUserBudget(userId , monthlyBudget , savingTarget);
+        return res.status(201).json({
+            status : true , 
+            data : updatedBudget
+        })
+
+    } catch(error) {
+        next(error); 
+    }
+}
+
 module.exports = {
     createUser , 
     login, 
-    userProfile
+    userProfile , 
+    updateBudget 
 }
 
