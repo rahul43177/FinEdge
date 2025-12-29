@@ -56,7 +56,28 @@ async function loginUser(userData) {
         token 
     }
 }
+
+async function getUserById(userId) {
+    const user = await User.findById(userId); 
+    if(!user) {
+        const error = new Error("User does not exists"); 
+        error.statusCode = 404; 
+        throw error; 
+    }
+
+    const userData = {
+        name : user.name , 
+        email : user.email , 
+        monthlyBudget : user.monthlyBudget , 
+        savingTarget : user.savingTarget 
+    }
+
+    return userData; 
+
+}
+
 module.exports = {
     createUser , 
-    loginUser
+    loginUser ,
+    getUserById
 }
