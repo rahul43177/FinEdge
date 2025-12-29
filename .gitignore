@@ -45,3 +45,6 @@ coverage/
 # --- Documentation ---
 # If you use tools like JSDoc
 docs/
+
+--Claude--
+/.claude
