@@ -1,5 +1,5 @@
 const express = require("express");
-const {createUser , login , userProfile} = require("../controllers/userController.js");
+const {createUser , login , userProfile, updateBudget} = require("../controllers/userController.js");
 const isValidToken = require("../middleware/authMiddleware.js");
 
 
@@ -13,5 +13,8 @@ router.post("/login" , login);
 
 //3. User profile 
 router.get("/profile" , isValidToken , userProfile);
+
+//4. Update budget 
+router.patch("/budget" , isValidToken , updateBudget);
 
 module.exports = router; 

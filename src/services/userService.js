@@ -76,8 +76,40 @@ async function getUserById(userId) {
 
 }
 
+async function updateUserBudget(userId, monthlyBudget, savingTarget) {
+    const updateUser = await User.findByIdAndUpdate(
+        userId , 
+        {
+            $set : {
+                monthlyBudget : monthlyBudget , 
+                savingTarget : savingTarget
+            }
+        } ,
+        {
+            new : true 
+        }
+    )
+
+    if(!updateUser) {
+        const error = new Error("The User does not exist"); 
+        error.statusCode = 404;
+        throw error; 
+    }
+
+    const userData = {
+        userId : updateUser._id , 
+        name : updateUser.name , 
+        email : updateUser.email , 
+        monthlyBudget : updateUser.monthlyBudget , 
+        savingTarget : updateUser.savingTarget
+    }
+
+    return userData; 
+}
+
 module.exports = {
     createUser , 
     loginUser ,
-    getUserById
+    getUserById,
+    updateUserBudget
 }
