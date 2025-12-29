@@ -2,34 +2,21 @@ require("dotenv").config();
 const express = require("express")
 const userRoute = require("./routes/userRoutes");
 const connectMongoDB = require("./database/connection");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express()
 
 app.use(express.json())
-
 //user route 
 app.use("/user" , userRoute); 
 
 
+//error global middleware 
+app.use(errorHandler); 
 //health check 
 app.get("/" , (req,res) => {
         return res.send("Health Check : Server running fine")
 })
-
-// const startServer = async () => {
-//     const PORT = process.env.PORT || 3000;
-//     try {
-//         await connectMongoDB();
-//         app.listen(PORT, () => {
-//             console.log(`Server is running on PORT: ${PORT}`);
-//         });
-//     } catch (err) {
-//         console.error('Failed to start server due to DB connection error:', err);
-//         process.exit(1);
-//     }
-// };
-
-// startServer();
 
 const startServer = async () => {
     try {

@@ -26,7 +26,7 @@
 **File:** `database/connection.js` (create new file)
 
 **Sub-tasks:**
-- [ ] Create `database/connection.js` file
+- [x] Create `database/connection.js` file
 - [ ] Write MongoDB connection function using Mongoose
 - [ ] Add connection error handling
 - [ ] Add connection success logging
