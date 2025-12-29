@@ -13,8 +13,22 @@ async function createUser(req , res , next) {
     }
 }
 
+async function login(req,res,next) {
+    try {   
+        const userData = req.body;
+        
+        const loginUser = await userService.loginUser(userData); 
+        res.status(200).json({
+            status : true , 
+            data : loginUser   
+        })
+    } catch(error) {
+        next(error)
+    }
+}
 
 module.exports = {
-    createUser
+    createUser , 
+    login
 }
 

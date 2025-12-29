@@ -1,5 +1,5 @@
-const User = require("../model/userModel")
-
+const User = require("../models/userModel"); 
+const jwt = require("jsonwebtoken");
 async function createUser(userData) {
     const {name , email , password , monthlyBudget , savingTarget} = userData; 
 
@@ -28,7 +28,35 @@ async function createUser(userData) {
     }
 };
 
+async function loginUser(userData) {
+    const {email , password} = userData; 
+    const user = await User.findOne({email}); 
+    if(!user) {
+        const error = new Error("The User does not exist"); 
+        error.statusCode = 404; 
+        throw error;
+    }
+    const userPayload = {
+        userId : user._id , 
+        name : user.name , 
+        email : user.email ,
+    }
 
+    let isPasswordValid = await user.comparePassword(password); 
+
+    if(!isPasswordValid) {
+        const error = new Error("Invalid password")
+        error.statusCode = 401; 
+        throw error; 
+    }
+
+    const token= jwt.sign(userPayload , process.env.JWT_SECRET); 
+    return {
+        userPayload , 
+        token 
+    }
+}
 module.exports = {
-    createUser
+    createUser , 
+    loginUser
 }
