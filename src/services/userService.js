@@ -76,13 +76,20 @@ async function getUserById(userId) {
 
 }
 
-async function updateUserBudget(userId, monthlyBudget, savingTarget) {
+async function updateUserBudget(userId,budgetDetails) {
+    const{ monthlyBudget, savingTarget }=   budgetDetails 
+
+    if(!monthlyBudget || !savingTarget) {
+        const error = new Error("Please enter all the fields!"); 
+        error.statusCode = 400; 
+        throw error; 
+    }
     const updateUser = await User.findByIdAndUpdate(
         userId , 
         {
             $set : {
-                monthlyBudget : monthlyBudget , 
-                savingTarget : savingTarget
+                monthlyBudget , 
+                savingTarget
             }
         } ,
         {
