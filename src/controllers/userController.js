@@ -46,10 +46,10 @@ async function userProfile(req,res,next) {
 const updateBudget = async (req,res,next) => {
     try {
         const userId = req.userData.userId; 
-        const {monthlyBudget, savingTarget} = req.body; 
+        const budgetDetails = req.body; 
 
-        const updatedBudget = await userService.updateUserBudget(userId , monthlyBudget , savingTarget);
-        return res.status(201).json({
+        const updatedBudget = await userService.updateUserBudget(userId ,budgetDetails);
+        return res.status(200).json({
             status : true , 
             data : updatedBudget
         })
