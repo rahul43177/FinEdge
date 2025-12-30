@@ -1,7 +1,7 @@
 const dayjs = require("dayjs");
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
-const Transactions = require("../models/transactionModel")
+const Transactions = require("../models/transactionModel");
 
 async function createTransaction(userId , transactionData) {
     const {type , category , amount , description } = transactionData ; 
@@ -39,7 +39,43 @@ async function createTransaction(userId , transactionData) {
     return response; 
 }
 
+async function getAllTransactions(userId , filters) {
+    let filterQuery = {}; 
+    filterQuery.userId = userId; 
+
+    //dynamically building filter query 
+
+    //type filterig 
+    if(filters.type) {
+        filterQuery.type = filters.type 
+    } 
+    //category filtering 
+    if(filters.category) {
+        filterQuery.category = filters.category
+    }
+    //date filtering 
+    if(filters.startDate || filters.endDate) {
+        filterQuery.date = {}; 
+        if(filters.startDate) {
+            filterQuery.date.$gte = dayjs(filters.startDate , "DD-MM-YYYY").toDate() ; 
+        } 
+        if(filters.endDate) {
+            filterQuery.date.$lte =  dayjs(filters.endDate , "DD-MM-YYYY").toDate() ; 
+        }
+    }
+
+    const filteredTransaction = await Transactions.find(filterQuery);
+  
+
+    const response = filteredTransaction.map((trans) => ({
+        ...trans.toObject() , 
+        date : dayjs(trans.date).format("DD-MM-YYYY")
+    }))
+
+    return response ; 
+}
 
 module.exports = {
-    createTransaction
+    createTransaction,
+    getAllTransactions
 }
