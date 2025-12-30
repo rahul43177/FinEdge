@@ -39,7 +39,43 @@ async function createTransaction(userId , transactionData) {
     return response; 
 }
 
+async function getAllTransactions(userId , filters) {
+    let filterQuery = {}; 
+    filterQuery.userId = userId; 
+
+    //dynamically building filter query 
+
+    //type filterig 
+    if(filters.type) {
+        filterQuery.type = filters.type 
+    } 
+    //category filtering 
+    if(filters.category) {
+        filterQuery.category = filters.category
+    }
+    //date filtering 
+    if(filters.startDate || filters.endDate) {
+        filterQuery.date = {}; 
+        if(filters.startDate) {
+            filterQuery.date.$gte = dayjs(filters.startDate , "DD-MM-YYYY").toDate() ; 
+        } 
+        if(filters.endDate) {
+            filterQuery.date.$lte =  dayjs(filters.endDate , "DD-MM-YYYY").toDate() ; 
+        }
+    }
+
+    const filteredTransaction = await Transactions.find(filterQuery);
+
+    // Format dates back to DD-MM-YYYY for response
+    const formattedTransactions = filteredTransaction.map(transaction => ({
+        ...transaction.toObject(),
+        date: dayjs(transaction.date).format("DD-MM-YYYY")
+    }));
+
+    return formattedTransactions; 
+}
 
 module.exports = {
-    createTransaction
+    createTransaction,
+    getAllTransactions
 }
