@@ -1,7 +1,7 @@
 const dayjs = require("dayjs");
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
-const Transactions = require("../models/transactionModel")
+const Transactions = require("../models/transactionModel");
 
 async function createTransaction(userId , transactionData) {
     const {type , category , amount , description } = transactionData ; 
@@ -65,14 +65,14 @@ async function getAllTransactions(userId , filters) {
     }
 
     const filteredTransaction = await Transactions.find(filterQuery);
+  
 
-    // Format dates back to DD-MM-YYYY for response
-    const formattedTransactions = filteredTransaction.map(transaction => ({
-        ...transaction.toObject(),
-        date: dayjs(transaction.date).format("DD-MM-YYYY")
-    }));
+    const response = filteredTransaction.map((trans) => ({
+        ...trans.toObject() , 
+        date : dayjs(trans.date).format("DD-MM-YYYY")
+    }))
 
-    return formattedTransactions; 
+    return response ; 
 }
 
 module.exports = {
