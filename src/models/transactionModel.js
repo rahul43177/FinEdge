@@ -27,7 +27,7 @@ const transactionSchema = new mongoose.Schema({
         type : Date , 
         default : Date.now  , 
         required : true 
-    } , 
+    },
     createdAt : {
         type : Date , 
         default : Date.now 

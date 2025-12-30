@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express")
 const userRoute = require("./routes/userRoutes");
+const transactionRoute = require("./routes/transactionRoutes"); 
 const connectMongoDB = require("./database/connection");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -8,8 +9,9 @@ const app = express()
 
 app.use(express.json())
 //user route 
-app.use("/user" , userRoute); 
-
+app.use("/users" , userRoute); 
+//transaction route 
+app.use("/transactions" ,  transactionRoute)
 
 //error global middleware 
 app.use(errorHandler); 
