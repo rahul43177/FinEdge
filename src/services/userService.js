@@ -1,122 +1,117 @@
 const User = require("../models/userModel"); 
 const jwt = require("jsonwebtoken");
-async function createUser(userData) {
-    const {name , email , password , monthlyBudget , savingTarget} = userData; 
+const error = require("../utils/errorUtils");
+const logger = require("../middleware/logger");
 
-    const existingUser = await User.findOne({email}); 
-    if(existingUser) {
-        const error = new Error("The user already exists"); 
-        error.statusCode = 409; 
-        throw error; 
+
+async function createUser(userData) {
+    const { name, email, password, monthlyBudget, savingTarget } = userData; 
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        logger.warn(`User registration attempt with existing email: ${email}`);
+        error.throwError409("The user already exists");
     }
 
     const user = await User.create({
-        name , 
-        email , 
-        password , 
-        monthlyBudget , 
-        savingTarget 
-    })
-
+        name,
+        email,
+        password,
+        monthlyBudget,
+        savingTarget
+    });
 
     return {
-        id : user._id , 
-        name : user.name , 
-        email : user.email , 
-        monthlyBudget : user.monthlyBudget , 
-        savingTarget : user.savingTarget 
-    }
-};
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        monthlyBudget: user.monthlyBudget,
+        savingTarget: user.savingTarget
+    };
+}
+
 
 async function loginUser(userData) {
-    const {email , password} = userData; 
-    const user = await User.findOne({email}); 
-    if(!user) {
-        const error = new Error("The User does not exist"); 
-        error.statusCode = 404; 
-        throw error;
+    const { email, password } = userData;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        logger.warn(`Login failed | user not found | email=${email}`);
+        error.throwError404("The User does not exist"); 
     }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+        logger.warn(`Invalid login attempt | email=${email}`);
+        error.throwError401("Invalid credentials");
+    }
+
     const userPayload = {
-        userId : user._id , 
-        name : user.name , 
-        email : user.email ,
-    }
+        userId: user._id,
+        name: user.name,
+        email: user.email
+    };
 
-    let isPasswordValid = await user.comparePassword(password); 
+    const token = jwt.sign(userPayload, process.env.JWT_SECRET);
 
-    if(!isPasswordValid) {
-        const error = new Error("Invalid password")
-        error.statusCode = 401; 
-        throw error; 
-    }
 
-    const token= jwt.sign(userPayload , process.env.JWT_SECRET); 
     return {
-        userPayload , 
-        token 
-    }
+        userPayload,
+        token
+    };
 }
 
 async function getUserById(userId) {
-    const user = await User.findById(userId); 
-    if(!user) {
-        const error = new Error("User does not exists"); 
-        error.statusCode = 404; 
-        throw error; 
+    const user = await User.findById(userId);
+    if (!user) {
+        error.throwError404("The User does not exist");
     }
 
-    const userData = {
-        name : user.name , 
-        email : user.email , 
-        monthlyBudget : user.monthlyBudget , 
-        savingTarget : user.savingTarget 
-    }
+    logger.info(`User profile fetched | userId=${userId}`);
 
-    return userData; 
-
+    return {
+        name: user.name,
+        email: user.email,
+        monthlyBudget: user.monthlyBudget,
+        savingTarget: user.savingTarget
+    };
 }
 
-async function updateUserBudget(userId,budgetDetails) {
-    const{ monthlyBudget, savingTarget }=   budgetDetails 
 
-    if(!monthlyBudget || !savingTarget) {
-        const error = new Error("Please enter all the fields!"); 
-        error.statusCode = 400; 
-        throw error; 
+async function updateUserBudget(userId, budgetDetails) {
+    const { monthlyBudget, savingTarget } = budgetDetails;
+
+    if (!monthlyBudget || !savingTarget) {
+        error.throwError400("Please provide all the fields");
     }
+
     const updateUser = await User.findByIdAndUpdate(
-        userId , 
+        userId,
         {
-            $set : {
-                monthlyBudget , 
+            $set: {
+                monthlyBudget,
                 savingTarget
             }
-        } ,
-        {
-            new : true 
-        }
-    )
+        },
+        { new: true }
+    );
 
-    if(!updateUser) {
-        const error = new Error("The User does not exist"); 
-        error.statusCode = 404;
-        throw error; 
+    if (!updateUser) {
+        error.throwError404("The User does not exist");
     }
 
-    const userData = {
-        userId : updateUser._id , 
-        name : updateUser.name , 
-        email : updateUser.email , 
-        monthlyBudget : updateUser.monthlyBudget , 
-        savingTarget : updateUser.savingTarget
-    }
-
-    return userData; 
+    return {
+        userId: updateUser._id,
+        name: updateUser.name,
+        email: updateUser.email,
+        monthlyBudget: updateUser.monthlyBudget,
+        savingTarget: updateUser.savingTarget
+    };
 }
 
 module.exports = {
-    createUser , 
-    loginUser ,
+    createUser,
+    loginUser,
     getUserById,
     updateUserBudget
-}
+};

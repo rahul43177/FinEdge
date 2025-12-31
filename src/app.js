@@ -4,30 +4,36 @@ const userRoute = require("./routes/userRoutes");
 const transactionRoute = require("./routes/transactionRoutes"); 
 const connectMongoDB = require("./database/connection");
 const errorHandler = require("./middleware/errorHandler");
+const logger = require("./middleware/logger");
+const requestLogger = require("./middleware/requestLogger");
 
 const app = express()
+const port = process.env.PORT || 3000;
 
-app.use(express.json())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 //user route 
 app.use("/users" , userRoute); 
 //transaction route 
-app.use("/transactions" ,  transactionRoute)
+app.use("/transactions" ,  transactionRoute);
 
 //error global middleware 
-app.use(errorHandler); 
+app.use(errorHandler);
+
 //health check 
-app.get("/" , (req,res) => {
+app.get("/health" , (req,res) => {
         return res.send("Health Check : Server running fine")
 })
 
 const startServer = async () => {
     try {
         await connectMongoDB(); 
-        app.listen(process.env.PORT , () => {
-            console.log(`The server is running on PORT : ${process.env.PORT}`)
+        app.listen(port,"::", () => {
+            logger.info(`The server is running on PORT : ${port}`)
         })
     } catch(error) {
-        console.log("Failed to start server to DB connection error:",err);
+        logger.info("Failed to start server to DB connection error:",error);
         process.exit(1); 
     }
 }

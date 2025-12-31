@@ -6,7 +6,7 @@ const isValidToken = require("../middleware/authMiddleware.js");
 const router = express.Router(); 
 
 //1. signUp Route
-router.post("/" , createUser);
+router.post("/signup" , createUser);
 
 //2. Login route 
 router.post("/login" , login);
