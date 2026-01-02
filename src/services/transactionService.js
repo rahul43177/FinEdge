@@ -5,6 +5,7 @@ const Transactions = require("../models/transactionModel");
 const mongoose = require("mongoose");
 const error = require("../utils/errorUtils");
 const logger = require("../middleware/logger");
+const cacheService = require("./cacheService");
 
 async function createTransaction(userId , transactionData) {
     const { type, category, amount, description } = transactionData;
@@ -32,6 +33,8 @@ async function createTransaction(userId , transactionData) {
         ...createNewTransaction.toObject(),
         date: dayjs(createNewTransaction.date).format("DD-MM-YYYY")
     };
+
+    cacheService.delete(`summary:${userId}`);
 
     return response;
 }
@@ -111,6 +114,8 @@ async function updateTransaction(transactionId, userId, updateData) {
         error.throwError404("Transaction not found or not authorized");
     }
 
+    cacheService.delete(`summary:${userId}`);
+
     logger.info(`Transaction updated | transactionId=${transactionId}`);
 
     return updatedTransaction;
@@ -132,7 +137,7 @@ async function deleteTransaction(transactionId, userId) {
         error.throwError404("Transaction not found or not authorized");
     }
 
-
+    cacheService.delete(`summary:${userId}`);
     logger.info(`Transaction deleted | transactionId=${transactionId}`);
 
     return deleted;

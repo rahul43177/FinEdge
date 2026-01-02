@@ -28,6 +28,10 @@ function throwError422(message) {
   throwError(message, 422);
 }
 
+function internalServerError(message) {
+  throwError(message, 500);
+}
+
 module.exports = {
   throwError,
   throwError400,
@@ -35,5 +39,6 @@ module.exports = {
   throwError403,
   throwError404,
   throwError409,
-  throwError422
+  throwError422,
+  internalServerError
 };
